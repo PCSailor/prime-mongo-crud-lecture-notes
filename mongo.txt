@@ -1,0 +1,63 @@
+prime-solo-mongo
+Phil Curtis
+--
+... indicates the line is missing a character in the query.
+--
+ db.orders.find()
+ db.orders.find().pretty()
+ REMOVE:
+ db.orders.remove({"_id" : ObjectId("58c82c5af8bd8469d6d3d2ff")})
+--
+Create a collection named orders.
+
+db.createCollection('orders')
+--
+Insert at least 3 documents that represent an order. IMPORTANT: See section below for fields.
+
+  db.orders.insert({orderDate: ("2017-03-14"), orderTotal: 823.99, lineItems:[{unitPrice: 199.99}, {quantity: 4}, {productName: "stungun"}]})
+  db.orders.insert({orderDate: ("2017-03-09"), orderTotal: 16934.57, lineItems:[{unitPrice: 14600.00}, {quantity: 1}, {productName: "jetpack"}]})
+  db.orders.insert({orderDate: ("2017-03-11"), orderTotal: 58986.28, lineItems:[{unitPrice: 26000.23}, {quantity: 2}, {productName: "transporter"}]})
+  db.orders.insert({orderDate: ("2014-09-10"), orderTotal: 57230.99, lineItems:[{unitPrice: 199.99, quantity: 40, productName: "stungun"}]})
+  db.orders.insert({orderDate: ("2002-03-09"), orderTotal: 96934.57, lineItems:[{unitPrice: 14600.00, quantity: 6, productName: "jetpack"}]})
+  db.orders.insert({orderDate: ("1997-02-19"), orderTotal: 122562.28, lineItems:[{unitPrice: 26000.23, quantity: 4, productName: "transporter"}]})
+
+--
+Find a single order document, any order document.
+  db.orders.findOne();
+--
+Find all orders and make them look pretty.
+db.orders.find().pretty();
+--
+Find all orders with an orderDate that is prior to 1/1/2016.
+
+  db.orders.find({orderDate:{$lte: ISODate("2015-012-31")}});
+  db.orders.find({orderDate:{$lt: new Date("2016-01-01")}});
+
+--
+Find all orders with an orderDate that is after 1/1/2016.
+
+db.orders.find({orderDate:{$gte: ISODate("2015-012-31")}});
+db.orders.find({orderDate:{$gt: new Date("2016-01-01")}});
+
+--
+Find orders with lineItems that have a quantity that is less than 50, but greater than 5. HINT: Look at $and and dot notation.
+
+  db.orders.find({
+                  $and: [
+                          {'lineItems.quantity': {$lt: 5}},
+                          {'lineItems.quantity': {$gt: 0}}
+                                                            ]});
+--
+Update one of your line items to 42.99. HINT: Look at dot notation
+
+ // Note: if it's 1st object, do not need to specify the particular object.  But if need any other object, must add some unique identifier.
+  With the {}: find & remove will find all objects AND update matches 1st object only
+
+  db.orders.update({}, {$set: {'lineItems.0.unitPrice': 42.99}});
+
+Note: lineItems[0].unitPrice // all other languages use bracket notation to select properties within arrays, but Mongodb uses .(dot) notation.
+
+--
+Remove one of your orders.
+  db.orders.remove({"_id" : ObjectId("58c82c5af8bd8469d6d3d2ff")})
+db.orders.remove({"_id" : ObjectId("58c82c5af8bd8469d6d3d2ff")})
